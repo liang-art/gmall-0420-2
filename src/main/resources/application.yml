@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: springcloud-gateway
+  # 配置网关的代理和路由功能
+  cloud:
+    gateway:
+      # routes ：就是一个  List<RouteDefinition> routes，
+      routes:
+        # -表示给集合创建一个元素 RouteDefinition  代表一个代理+路由对象
+        # id表示 一个代理路由对象的  唯一标志，可以随意指定但是推荐使用要代理的服务名称
+        - id: springcloud-consumer-user-feign
+          # 表示网关项目接受到访问user服务的请求时将请求路由给哪个地址来处理
+          uri: http://127.0.0.1:8002
+          # 断言集合配置：List<PredicateDefinition>
+          predicates:
+            # 地址的断言，访问网关的地址项目名后如果是/user/* 地址，则由本路由代理配置来处理
+            # 如果浏览器访问:http://localhost:10000/user/getUser?id=1  网关项目接受到后，会将此请求交给这个配置的路由处理
+            # 网关项目路由此请求给 http://127.0.0.1:8000/user/getUser?id=1
+            - Path=/user/*
+        - id: springcloud-provider-movie
+          #uri: http://127.0.0.1:7001
+          # 负载均衡的配置
+          uri: lb://SPRINGCLOUD-PROVIDER-MOVIE
+          predicates:
+            # http://localhost:10000/movie/xxx
+            - Path=/movie/*
